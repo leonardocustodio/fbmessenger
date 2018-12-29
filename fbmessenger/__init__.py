@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '5.3.2'
+__version__ = '5.3.3'
 
 logger = logging.getLogger(__name__)
 
@@ -249,6 +249,10 @@ class BaseMessenger(object):
     def read(self, message):
         """Method to handle `message_reads`"""
 
+    @abc.abstractmethod
+    def handover(self, message):
+        """Method to handle `message_handovers`"""
+
     def handle(self, payload):
         for entry in payload['entry']:
             for message in entry['messaging']:
@@ -265,6 +269,8 @@ class BaseMessenger(object):
                     return self.postback(message)
                 elif message.get('read'):
                     return self.read(message)
+                elif message.get('request_thread_control'):
+                    return self.handover(message)
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

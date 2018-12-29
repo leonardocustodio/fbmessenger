@@ -94,13 +94,13 @@ class MessengerClient(object):
 
     def pass_thread_control(self, target_app_id, metadata, entry, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/messages',
+            'https://graph.facebook.com/v2.11/me/pass_thread_control',
             params={
                 'access_token': self.page_access_token
             },
             json={
                 'recipient': {
-                    'id': entry['sender']['id']
+                    'id': entry['recipient']['id']
                 },
                 'target_app_id': target_app_id,
                 'metadata': metadata

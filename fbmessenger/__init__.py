@@ -92,6 +92,23 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def pass_thread_control(self, target_app_id, metadata, entry, timeout=None):
+        r = self.session.post(
+            'https://graph.facebook.com/v2.11/me/messages',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'recipient': {
+                    'id': entry['sender']['id']
+                },
+                'target_app_id': target_app_id,
+                'metadata': metadata
+            },
+            timeout=timeout
+        )
+        return r.json()
+
     def subscribe_app_to_page(self, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/subscribed_apps',

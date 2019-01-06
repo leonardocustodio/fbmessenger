@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '9.0.0'
+__version__ = '5.3.9'
 
 logger = logging.getLogger(__name__)
 

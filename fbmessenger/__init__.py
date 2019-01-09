@@ -92,7 +92,7 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def pass_thread_control(self, target_app_id, metadata, entry, timeout=None):
+    def pass_thread_control(self, target_app_id, metadata, entry, timeout=2):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/pass_thread_control',
             params={
@@ -109,7 +109,7 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def take_thread_control(self, metadata, entry, timeout=None):
+    def take_thread_control(self, metadata, entry, timeout=2):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/take_thread_control',
             params={
@@ -117,6 +117,7 @@ class MessengerClient(object):
             },
             json={
                 'recipient': {
+
                     'id': entry['recipient']['id']
                 },
                 'metadata': metadata

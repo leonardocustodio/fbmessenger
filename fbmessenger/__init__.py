@@ -305,6 +305,8 @@ class BaseMessenger(object):
                     return self.read(message)
                 elif message.get('request_thread_control'):
                     return self.handover(message)
+                elif message.get('pass_thread_control'):
+                    return self.handover(message)
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

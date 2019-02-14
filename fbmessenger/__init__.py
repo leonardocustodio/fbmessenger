@@ -314,7 +314,6 @@ class BaseMessenger(object):
                     if standby.get('postback'):
                         standby['postback']['payload'] = standby['postback']['title']
                         return self.postback(standby)
-                print(entry)
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '5.3.9'
+__version__ = '5.9.9'
 
 logger = logging.getLogger(__name__)
 
@@ -289,24 +289,27 @@ class BaseMessenger(object):
 
     def handle(self, payload):
         for entry in payload['entry']:
-            for message in entry['messaging']:
-                self.last_message = message
-                if message.get('account_linking'):
-                    return self.account_linking(message)
-                elif message.get('delivery'):
-                    return self.delivery(message)
-                elif message.get('message'):
-                    return self.message(message)
-                elif message.get('optin'):
-                    return self.optin(message)
-                elif message.get('postback'):
-                    return self.postback(message)
-                elif message.get('read'):
-                    return self.read(message)
-                elif message.get('request_thread_control'):
-                    return self.handover(message)
-                elif message.get('pass_thread_control'):
-                    return self.handover(message)
+            if 'messaging' in entry:
+                for message in entry['messaging']:
+                    self.last_message = message
+                    if message.get('account_linking'):
+                        return self.account_linking(message)
+                    elif message.get('delivery'):
+                        return self.delivery(message)
+                    elif message.get('message'):
+                        return self.message(message)
+                    elif message.get('optin'):
+                        return self.optin(message)
+                    elif message.get('postback'):
+                        return self.postback(message)
+                    elif message.get('read'):
+                        return self.read(message)
+                    elif message.get('request_thread_control'):
+                        return self.handover(message)
+                    elif message.get('pass_thread_control'):
+                        return self.handover(message)
+            elif 'standby' in entry:
+                print(entry)
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

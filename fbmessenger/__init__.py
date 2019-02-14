@@ -312,8 +312,8 @@ class BaseMessenger(object):
                 for standby in entry['standby']:
                     self.last_message = standby
                     if standby.get('postback'):
-                        print('Button clicked')
-                        return self.message(standby.get('postback').get('title'))
+                        standby['postback']['payload'] = standby['postback']['title']
+                        return self.postback(standby)
                 print(entry)
 
     def get_user(self, timeout=None):

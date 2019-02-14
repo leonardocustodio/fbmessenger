@@ -311,7 +311,7 @@ class BaseMessenger(object):
             elif 'standby' in entry:
                 for standby in entry['standby']:
                     self.last_message = standby
-                    if message.get('postback'):
+                    if standby.get('postback'):
                         print('Button clicked')
                         return self.postback(message)
                 print(entry)

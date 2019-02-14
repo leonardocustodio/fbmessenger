@@ -309,6 +309,11 @@ class BaseMessenger(object):
                     elif message.get('pass_thread_control'):
                         return self.handover(message)
             elif 'standby' in entry:
+                for standby in entry['standby']:
+                    self.last_message = standby
+                    if message.get('postback'):
+                        print('Button clicked')
+                        return self.postback(message)
                 print(entry)
 
     def get_user(self, timeout=None):

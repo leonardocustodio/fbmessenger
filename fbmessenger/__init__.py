@@ -313,7 +313,7 @@ class BaseMessenger(object):
                     self.last_message = standby
                     if standby.get('postback'):
                         print('Button clicked')
-                        return self.postback(message)
+                        return self.postback(standby)
                 print(entry)
 
     def get_user(self, timeout=None):

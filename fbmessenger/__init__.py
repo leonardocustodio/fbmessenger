@@ -328,7 +328,7 @@ class BaseMessenger(object):
                         return self.handover(message)
                     elif message.get('pass_thread_control'):
                         return self.handover(message)
-                    elif message.get('referral')
+                    elif message.get('referral'):
                         return self.referral(message)
             elif 'standby' in entry:
                 for standby in entry['standby']:

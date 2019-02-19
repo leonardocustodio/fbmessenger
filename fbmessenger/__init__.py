@@ -71,7 +71,7 @@ class MessengerClient(object):
 
         dashdata = {
             'url': 'https://graph.facebook.com/v2.6/me/messages',
-            'qs': { 'access_token': os.environ.get['FB_ACCESS_TOKEN']},
+            'qs': { 'access_token': os.environ["FB_ACCESS_TOKEN"]},
             'method': 'POST',
             'json': body
         }

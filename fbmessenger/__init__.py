@@ -300,6 +300,10 @@ class BaseMessenger(object):
     def handover(self, message):
         """Method to handle `message_handovers`"""
 
+    @abc.abstractmethod
+    def referral(self, message):
+        """Method to handle referrals"""
+
     def handle(self, payload):
         print("Handle: {}".format(payload))
         dba.logIncoming(payload)
@@ -324,6 +328,8 @@ class BaseMessenger(object):
                         return self.handover(message)
                     elif message.get('pass_thread_control'):
                         return self.handover(message)
+                    elif message.get('referral')
+                        return self.referral(message)
             elif 'standby' in entry:
                 for standby in entry['standby']:
                     self.last_message = standby

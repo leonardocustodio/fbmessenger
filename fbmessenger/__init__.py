@@ -6,7 +6,7 @@ import os
 import requests
 from dashbot import generic
 
-__version__ = '5.9.10'
+__version__ = '5.9.11'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])

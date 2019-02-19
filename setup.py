@@ -78,7 +78,10 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    install_requires=['requests>=2.0'],
+    install_requires=[
+        'git+git://github.com/leonardocustodio/dashbotpy@facebook#dashbotpy=dashbotpy',
+        'requests>=2.0'
+    ],
     packages=['fbmessenger'],
     cmdclass={'test': PyTest},
     tests_require=test_requirements,

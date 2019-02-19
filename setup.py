@@ -79,7 +79,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     install_requires=[
-        'dashbotpy @ https://github.com/leonardocustodio/dashbotpy/tarball/facebook#egg=dashbotpy=0.0.19',
+        'dashbot @ https://github.com/leonardocustodio/dashbotpy/tarball/facebook#egg=dashbot=0.0.19',
         'requests>=2.0'
     ],
     packages=['fbmessenger'],

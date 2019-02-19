@@ -9,7 +9,8 @@ from dashbot import generic
 __version__ = '5.9.10'
 
 logger = logging.getLogger(__name__)
-dba = generic.generic(os.environ.get['DASHBOT_KEY'])
+dashkey = os.environ.get['DASHBOT_KEY']
+dba = generic.generic("{}".format(dashkey))
 
 class MessengerClient(object):
 

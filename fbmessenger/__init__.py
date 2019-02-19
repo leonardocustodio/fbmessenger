@@ -1,13 +1,15 @@
 from __future__ import absolute_import
 import abc
 import logging
+import os
 
 import requests
+from dashbot import generic
 
-__version__ = '5.9.9'
+__version__ = '5.9.10'
 
 logger = logging.getLogger(__name__)
-
+dba = generic.generic(os.environ.get['DASHBOT_KEY'])
 
 class MessengerClient(object):
 
@@ -66,6 +68,16 @@ class MessengerClient(object):
                         notification_type))
             body['notification_type'] = notification_type
 
+
+        dashdata = {
+            'url': 'https://graph.facebook.com/v2.6/me/messages',
+            'qs': { 'access_token': os.environ.get['FB_ACCESS_TOKEN']},
+            'method': 'POST',
+            'json': body
+        }
+        dba.logOutgoing(dashdata)
+
+
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={
@@ -74,6 +86,7 @@ class MessengerClient(object):
             json=body,
             timeout=timeout
         )
+
         return r.json()
 
     def send_action(self, sender_action, entry, timeout=None):
@@ -288,6 +301,9 @@ class BaseMessenger(object):
         """Method to handle `message_handovers`"""
 
     def handle(self, payload):
+        print("Handle: {}".format(payload))
+        dba.logIncoming(payload)
+
         for entry in payload['entry']:
             if 'messaging' in entry:
                 for message in entry['messaging']:

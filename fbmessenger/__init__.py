@@ -2,14 +2,16 @@ from __future__ import absolute_import
 import abc
 import logging
 import os
+import uuid
 
 import requests
 from dashbot import generic
 
-__version__ = '5.9.10'
+__version__ = '5.9.12'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
+apiurl = "https://nissan.api.cb.laura-br.com"
 
 class MessengerClient(object):
 
@@ -306,7 +308,6 @@ class BaseMessenger(object):
 
     def handle(self, payload):
         print("Handle: {}".format(payload))
-        dba.logIncoming(payload)
 
         for entry in payload['entry']:
             if 'messaging' in entry:
@@ -317,11 +318,57 @@ class BaseMessenger(object):
                     elif message.get('delivery'):
                         return self.delivery(message)
                     elif message.get('message'):
+                        # Add post to Nissan API to save message!
+                        url = '{}/dash-messages'.format(apiurl)
+                        headers = {'Content-type': 'application/json'}
+
+                        json = {
+                            'id': str(uuid.uuid4()),
+                            'senderId': message.get('sender').get('id'),
+                            'senderType': 'user',
+                            'msgId': message.get('message').get('mid'),
+                            'msgContent': message.get('message').get('text'),
+                            'msgType': 'text',
+                            'payload': str(payload),
+                            'channel': 'facebook',
+                            'source': 'page',
+                            'timestamp': str(entry.get('time'))
+                        }
+
+                        if message.get('message').get('tags'):
+                            if message.get('message').get('tags').get('source'):
+                                json['source'] = message.get('message').get('tags').get('source')
+
+                        request = requests.post(url, json=json, headers=headers)
                         return self.message(message)
+
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
+                        # Add post to Nissan API to save message!
+                        url = '{}/dash-messages'.format(apiurl)
+                        headers = {'Content-type': 'application/json'}
+
+                        json = {
+                            'id': str(uuid.uuid4()),
+                            'senderId': message.get('sender').get('id'),
+                            'senderType': 'user',
+                            'msgId': str(entry.get('id')),
+                            'msgContent': message.get('postback').get('payload'),
+                            'msgType': 'postback',
+                            'payload': str(payload),
+                            'channel': 'facebook',
+                            'source': 'page',
+                            'timestamp': str(entry.get('time'))
+                        }
+
+                        if message.get('postback').get('referral'):
+                            if message.get('postback').get('referral').get('source'):
+                                json['source'] = message.get('postback').get('referral').get('source')
+
+                        request = requests.post(url, json=json, headers=headers)
                         return self.postback(message)
+
                     elif message.get('read'):
                         return self.read(message)
                     elif message.get('request_thread_control'):

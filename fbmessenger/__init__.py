@@ -134,7 +134,8 @@ class MessengerClient(object):
                         notification_type))
             body['notification_type'] = notification_type
 
-        Analytics.send_outgoing(body, True)
+        Analytics.send_outgoing(body)
+
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={

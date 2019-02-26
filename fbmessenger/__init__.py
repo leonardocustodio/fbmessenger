@@ -17,7 +17,7 @@ api_url = "https://nissan.api.cb.laura-br.com"
 class Analytics(object):
 
     @staticmethod
-    def save(is_echo: False, message, entry, payload, message_type, is_human: False):
+    def save(is_echo=False, message, entry, payload, message_type, is_human=False):
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 

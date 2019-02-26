@@ -7,11 +7,75 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.12'
+__version__ = '5.9.15'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
-apiurl = "https://nissan.api.cb.laura-br.com"
+api_url = "https://nissan.api.cb.laura-br.com"
+
+
+class Analytics(object):
+
+    @staticmethod
+    def save(is_echo: False, message, entry, payload, message_type, is_human: False):
+        url = '{}/dash-messages'.format(api_url)
+        headers = {'Content-type': 'application/json'}
+
+        if message_type is 'message':
+            json = {
+                'id': str(uuid.uuid4()),
+                'senderId': message.get('sender').get('id'),
+                'senderType': 'user',
+                'recipientId': message.get('recipient').get('id'),
+                'msgId': message.get('message').get('mid'),
+                'msgContent': message.get('message').get('text'),
+                'msgType': 'text',
+                'payload': str(payload),
+                'channel': 'facebook',
+                'source': 'page',
+                'timestamp': str(entry.get('time'))
+            }
+
+            if message.get('message').get('tags'):
+                if message.get('message').get('tags').get('source'):
+                    json['source'] = message.get('message').get('tags').get('source')
+
+        elif message_type is 'postback':
+            json = {
+                'id': str(uuid.uuid4()),
+                'senderId': message.get('sender').get('id'),
+                'senderType': 'user',
+                'recipientId': message.get('recipient').get('id'),
+                'msgId': str(entry.get('id')),
+                'msgContent': message.get('postback').get('payload'),
+                'msgType': 'postback',
+                'payload': str(payload),
+                'channel': 'facebook',
+                'source': 'page',
+                'timestamp': str(entry.get('time'))
+            }
+
+            if message.get('postback').get('referral'):
+                if message.get('postback').get('referral').get('source'):
+                    json['source'] = message.get('postback').get('referral').get('source')
+
+        if is_echo is True:
+            json['flag'] = True
+            json['senderType'] = 'bot'
+
+        request = requests.post(url, json=json, headers=headers)
+
+    @staticmethod
+    def send_outgoing(body):
+        # Save message to Dashbot
+        data = {
+            'url': 'https://graph.facebook.com/v2.6/me/messages',
+            'qs': {'access_token': os.environ["FB_ACCESS_TOKEN"]},
+            'method': 'POST',
+            'json': body
+        }
+        dba.logOutgoing(data)
+
 
 class MessengerClient(object):
 
@@ -70,16 +134,7 @@ class MessengerClient(object):
                         notification_type))
             body['notification_type'] = notification_type
 
-
-        dashdata = {
-            'url': 'https://graph.facebook.com/v2.6/me/messages',
-            'qs': { 'access_token': os.environ["FB_ACCESS_TOKEN"]},
-            'method': 'POST',
-            'json': body
-        }
-        dba.logOutgoing(dashdata)
-
-
+        Analytics.send_outgoing(body, True)
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={
@@ -299,6 +354,10 @@ class BaseMessenger(object):
         """Method to handle `message_reads`"""
 
     @abc.abstractmethod
+    def echo(self, message):
+        """Method to handle `message_echoes`"""
+
+    @abc.abstractmethod
     def handover(self, message):
         """Method to handle `message_handovers`"""
 
@@ -318,57 +377,19 @@ class BaseMessenger(object):
                     elif message.get('delivery'):
                         return self.delivery(message)
                     elif message.get('message'):
-                        # Add post to Nissan API to save message!
-                        url = '{}/dash-messages'.format(apiurl)
-                        headers = {'Content-type': 'application/json'}
-
-                        json = {
-                            'id': str(uuid.uuid4()),
-                            'senderId': message.get('sender').get('id'),
-                            'senderType': 'user',
-                            'msgId': message.get('message').get('mid'),
-                            'msgContent': message.get('message').get('text'),
-                            'msgType': 'text',
-                            'payload': str(payload),
-                            'channel': 'facebook',
-                            'source': 'page',
-                            'timestamp': str(entry.get('time'))
-                        }
-
-                        if message.get('message').get('tags'):
-                            if message.get('message').get('tags').get('source'):
-                                json['source'] = message.get('message').get('tags').get('source')
-
-                        request = requests.post(url, json=json, headers=headers)
-                        return self.message(message)
-
+                        if message.get('message').get('is_echo') is True:
+                            Analytics.save(True, message, entry, payload, 'message')
+                        else:
+                            Analytics.save(False, message, entry, payload, 'message')
+                            return self.message(message)
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
-                        # Add post to Nissan API to save message!
-                        url = '{}/dash-messages'.format(apiurl)
-                        headers = {'Content-type': 'application/json'}
-
-                        json = {
-                            'id': str(uuid.uuid4()),
-                            'senderId': message.get('sender').get('id'),
-                            'senderType': 'user',
-                            'msgId': str(entry.get('id')),
-                            'msgContent': message.get('postback').get('payload'),
-                            'msgType': 'postback',
-                            'payload': str(payload),
-                            'channel': 'facebook',
-                            'source': 'page',
-                            'timestamp': str(entry.get('time'))
-                        }
-
-                        if message.get('postback').get('referral'):
-                            if message.get('postback').get('referral').get('source'):
-                                json['source'] = message.get('postback').get('referral').get('source')
-
-                        request = requests.post(url, json=json, headers=headers)
-                        return self.postback(message)
-
+                        if message.get('message').get('is_echo') is True:
+                            Analytics.save(True, message, entry, payload, 'postback')
+                        else:
+                            Analytics.save(False, message, entry, payload, 'postback')
+                            return self.postback(message)
                     elif message.get('read'):
                         return self.read(message)
                     elif message.get('request_thread_control'):

@@ -17,7 +17,7 @@ api_url = "https://nissan.api.cb.laura-br.com"
 class Analytics(object):
 
     @staticmethod
-    def save(is_echo=False, message, entry, payload, message_type, is_human=False):
+    def save(message, entry, payload, message_type, is_echo=False):
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 
@@ -378,17 +378,17 @@ class BaseMessenger(object):
                         return self.delivery(message)
                     elif message.get('message'):
                         if message.get('message').get('is_echo') is True:
-                            Analytics.save(True, message, entry, payload, 'message')
+                            Analytics.save(message, entry, payload, 'message', True)
                         else:
-                            Analytics.save(False, message, entry, payload, 'message')
+                            Analytics.save(message, entry, payload, 'message', True)
                             return self.message(message)
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
                         if message.get('postback').get('is_echo') is True:
-                            Analytics.save(True, message, entry, payload, 'postback')
+                            Analytics.save(message, entry, payload, 'postback', True)
                         else:
-                            Analytics.save(False, message, entry, payload, 'postback')
+                            Analytics.save(message, entry, payload, 'postback', True)
                             return self.postback(message)
                     elif message.get('read'):
                         return self.read(message)

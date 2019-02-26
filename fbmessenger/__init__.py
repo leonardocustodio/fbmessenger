@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.15'
+__version__ = '5.9.16'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -385,7 +385,7 @@ class BaseMessenger(object):
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
-                        if message.get('message').get('is_echo') is True:
+                        if message.get('postback').get('is_echo') is True:
                             Analytics.save(True, message, entry, payload, 'postback')
                         else:
                             Analytics.save(False, message, entry, payload, 'postback')

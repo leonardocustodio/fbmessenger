@@ -383,7 +383,7 @@ class BaseMessenger(object):
                         if message.get('message').get('is_echo') is True:
                             Analytics.save(message, entry, payload, 'message', True)
                         else:
-                            Analytics.save(message, entry, payload, 'message', True)
+                            Analytics.save(message, entry, payload, 'message', False)
                             return self.message(message)
                     elif message.get('optin'):
                         return self.optin(message)
@@ -391,7 +391,7 @@ class BaseMessenger(object):
                         if message.get('postback').get('is_echo') is True:
                             Analytics.save(message, entry, payload, 'postback', True)
                         else:
-                            Analytics.save(message, entry, payload, 'postback', True)
+                            Analytics.save(message, entry, payload, 'postback', False)
                             return self.postback(message)
                     elif message.get('read'):
                         return self.read(message)

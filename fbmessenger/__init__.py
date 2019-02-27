@@ -33,6 +33,7 @@ class Analytics(object):
                 'payload': str(payload),
                 'channel': 'facebook',
                 'source': 'page',
+                'flag': False,
                 'timestamp': str(entry.get('time'))
             }
 
@@ -52,6 +53,7 @@ class Analytics(object):
                 'payload': str(payload),
                 'channel': 'facebook',
                 'source': 'page',
+                'flag': False,
                 'timestamp': str(entry.get('time'))
             }
 

@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.17'
+__version__ = '5.9.18'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -17,7 +17,7 @@ api_url = "https://nissan.api.cb.laura-br.com"
 class Analytics(object):
 
     @staticmethod
-    def save(message, entry, payload, message_type, is_echo=False):
+    def save(message, entry, payload, message_type, is_echo=False, thread_control="Bot"):
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 
@@ -34,6 +34,7 @@ class Analytics(object):
                 'channel': 'facebook',
                 'source': 'page',
                 'flag': False,
+                'threadControl': thread_control,
                 'timestamp': str(entry.get('time'))
             }
 
@@ -54,6 +55,7 @@ class Analytics(object):
                 'channel': 'facebook',
                 'source': 'page',
                 'flag': False,
+                'threadControl': thread_control,
                 'timestamp': str(entry.get('time'))
             }
 
@@ -382,17 +384,17 @@ class BaseMessenger(object):
                         return self.delivery(message)
                     elif message.get('message'):
                         if message.get('message').get('is_echo') is True:
-                            Analytics.save(message, entry, payload, 'message', True)
+                            Analytics.save(message, entry, payload, 'message', True, "Bot")
                         else:
-                            Analytics.save(message, entry, payload, 'message', False)
+                            Analytics.save(message, entry, payload, 'message', False, "Bot")
                             return self.message(message)
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
                         if message.get('postback').get('is_echo') is True:
-                            Analytics.save(message, entry, payload, 'postback', True)
+                            Analytics.save(message, entry, payload, 'postback', True, "Bot")
                         else:
-                            Analytics.save(message, entry, payload, 'postback', False)
+                            Analytics.save(message, entry, payload, 'postback', False, "Bot")
                             return self.postback(message)
                     elif message.get('read'):
                         return self.read(message)
@@ -406,8 +408,14 @@ class BaseMessenger(object):
                 for standby in entry['standby']:
                     self.last_message = standby
                     if standby.get('postback'):
+                        Analytics.save(standby, entry, payload, 'postback', False, "Agent")
                         standby['postback']['payload'] = standby['postback']['title']
                         return self.postback(standby)
+                    elif standby.get('message'):
+                        if message.get('message').get('is_echo') is True:
+                            Analytics.save(standby, entry, payload, 'message', True, "Agent")
+                        else:
+                            Analytics.save(standby, entry, payload, 'message', False, "Agent")
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

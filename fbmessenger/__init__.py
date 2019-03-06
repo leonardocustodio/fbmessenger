@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.21'
+__version__ = '5.9.23'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -71,7 +71,8 @@ class Analytics(object):
                 json['senderType'] = 'bot'
 
         request = requests.post(url, json=json, headers=headers)
-        print("{}".format(request))
+        if not request.ok:
+            print("[Error] Analytics Save: {0}".format(json))
 
     @staticmethod
     def send_outgoing(body):
@@ -387,17 +388,17 @@ class BaseMessenger(object):
                         return self.delivery(message)
                     elif message.get('message'):
                         if message.get('message').get('is_echo') is True:
-                            Analytics.save(message, entry, payload, 'message', True, "Bot")
+                            Analytics.save(message, entry, payload, 'message', True, "bot")
                         else:
-                            Analytics.save(message, entry, payload, 'message', False, "Bot")
+                            Analytics.save(message, entry, payload, 'message', False, "bot")
                             return self.message(message)
                     elif message.get('optin'):
                         return self.optin(message)
                     elif message.get('postback'):
                         if message.get('postback').get('is_echo') is True:
-                            Analytics.save(message, entry, payload, 'postback', True, "Bot")
+                            Analytics.save(message, entry, payload, 'postback', True, "bot")
                         else:
-                            Analytics.save(message, entry, payload, 'postback', False, "Bot")
+                            Analytics.save(message, entry, payload, 'postback', False, "bot")
                             return self.postback(message)
                     elif message.get('read'):
                         return self.read(message)

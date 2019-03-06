@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.20'
+__version__ = '5.9.21'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -65,7 +65,10 @@ class Analytics(object):
 
         if is_echo is True:
             json['flag'] = True
-            json['senderType'] = 'bot'
+            if thread_control is "agent":
+                json['senderType'] = 'agent'
+            else:
+                json['senderType'] = 'bot'
 
         request = requests.post(url, json=json, headers=headers)
         print("{}".format(request))

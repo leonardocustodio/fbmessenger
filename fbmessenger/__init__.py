@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.18'
+__version__ = '5.9.20'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -17,7 +17,7 @@ api_url = "https://nissan.api.cb.laura-br.com"
 class Analytics(object):
 
     @staticmethod
-    def save(message, entry, payload, message_type, is_echo=False, thread_control="Bot"):
+    def save(message, entry, payload, message_type, is_echo=False, thread_control="bot"):
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 
@@ -408,14 +408,14 @@ class BaseMessenger(object):
                 for standby in entry['standby']:
                     self.last_message = standby
                     if standby.get('postback'):
-                        Analytics.save(standby, entry, payload, 'postback', False, "Agent")
+                        Analytics.save(standby, entry, payload, 'postback', False, "agent")
                         standby['postback']['payload'] = standby['postback']['title']
                         return self.postback(standby)
                     elif standby.get('message'):
-                        if message.get('message').get('is_echo') is True:
-                            Analytics.save(standby, entry, payload, 'message', True, "Agent")
+                        if standby.get('message').get('is_echo') is True:
+                            Analytics.save(standby, entry, payload, 'message', True, "agent")
                         else:
-                            Analytics.save(standby, entry, payload, 'message', False, "Agent")
+                            Analytics.save(standby, entry, payload, 'message', False, "agent")
 
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)

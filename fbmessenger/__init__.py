@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.25'
+__version__ = '5.9.26'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -19,7 +19,7 @@ class Analytics(object):
 
     @staticmethod
     def save(message, entry, payload, message_type, is_echo=False, thread_control="bot"):
-        if analytics is False:
+        if analytics.lower() == 'false':
             return
 
         url = '{}/dash-messages'.format(api_url)
@@ -80,7 +80,7 @@ class Analytics(object):
 
     @staticmethod
     def send_outgoing(body):
-        if analytics is False:
+        if analytics.lower() == 'false':
             return
 
         # Save message to Dashbot

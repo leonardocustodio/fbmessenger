@@ -7,12 +7,12 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.24'
+__version__ = '5.9.25'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
-api_url = generic.generic(os.environ["API_URL"])
-analytics = generic.generic(os.environ["ANALYTICS"])
+api_url = os.environ["API_URL"]
+analytics = os.environ["ANALYTICS"]
 
 
 class Analytics(object):

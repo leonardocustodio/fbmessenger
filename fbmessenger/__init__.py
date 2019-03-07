@@ -7,17 +7,21 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.23'
+__version__ = '5.9.24'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
-api_url = "https://nissan.api.cb.laura-br.com"
+api_url = generic.generic(os.environ["API_URL"])
+analytics = generic.generic(os.environ["ANALYTICS"])
 
 
 class Analytics(object):
 
     @staticmethod
     def save(message, entry, payload, message_type, is_echo=False, thread_control="bot"):
+        if analytics is False:
+            return
+
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 
@@ -76,6 +80,9 @@ class Analytics(object):
 
     @staticmethod
     def send_outgoing(body):
+        if analytics is False:
+            return
+
         # Save message to Dashbot
         data = {
             'url': 'https://graph.facebook.com/v2.6/me/messages',

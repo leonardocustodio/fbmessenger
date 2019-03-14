@@ -6,13 +6,17 @@ import uuid
 
 import requests
 from dashbot import generic
+from dotenv import load_dotenv
 
-__version__ = '5.9.26'
+__version__ = '5.9.27'
+
+env_path = '/app/.env'
+load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
-dba = generic.generic(os.environ["DASHBOT_KEY"])
-api_url = os.environ["API_URL"]
-analytics = os.environ["ANALYTICS"]
+dba = generic.generic(os.getenv("DASHBOT_KEY"))
+api_url = os.getenv("API_URL")
+analytics = os.getenv("ANALYTICS")
 
 
 class Analytics(object):
@@ -86,7 +90,7 @@ class Analytics(object):
         # Save message to Dashbot
         data = {
             'url': 'https://graph.facebook.com/v2.6/me/messages',
-            'qs': {'access_token': os.environ["FB_ACCESS_TOKEN"]},
+            'qs': {'access_token': os.getenv("FB_ACCESS_TOKEN")},
             'method': 'POST',
             'json': body
         }

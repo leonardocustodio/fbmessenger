@@ -6,19 +6,14 @@ import uuid
 
 import requests
 from dashbot import generic
-from dotenv import load_dotenv
 
 __version__ = '5.9.36'
 
-env_path = '/app/.env'
-load_dotenv(dotenv_path=env_path)
-
 logger = logging.getLogger(__name__)
-dba = generic.generic(os.getenv("DASHBOT_KEY"))
-api_url = os.getenv("API_URL")
-analytics = os.getenv("ANALYTICS")
-fb_access_token = os.getenv("FB_ACCESS_TOKEN")
-
+dba = generic.generic(os.environ["DASHBOT_KEY"])
+api_url = os.environ["API_URL"]
+analytics = os.environ["ANALYTICS"]
+fb_access_token = os.environ["FB_ACCESS_TOKEN"]
 
 class Analytics(object):
 

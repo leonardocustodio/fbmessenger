@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.39'
+__version__ = '5.9.40'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -34,8 +34,9 @@ class Analytics(object):
             request = requests.get('{}/count'.format(url_users), json=json_users, headers=headers_users)
             if request.ok:
                 r_json = request.json()
+                print("PSID: {0} - Count: {1}".format(message.get('sender').get('id'), r_json['count']))
 
-                if r_json['count'] == 0:
+                if r_json['count'] is 0:
 
                     r = requests.get(
                         'https://graph.facebook.com/v2.11/{sender}'.format(sender=message.get('sender').get('id')),

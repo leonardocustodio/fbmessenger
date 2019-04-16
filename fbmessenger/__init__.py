@@ -8,7 +8,7 @@ import requests
 from dashbot import generic
 from dotenv import load_dotenv
 
-__version__ = '5.9.27'
+__version__ = '5.9.36'
 
 env_path = '/app/.env'
 load_dotenv(dotenv_path=env_path)
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 dba = generic.generic(os.getenv("DASHBOT_KEY"))
 api_url = os.getenv("API_URL")
 analytics = os.getenv("ANALYTICS")
+fb_access_token = os.getenv("FB_ACCESS_TOKEN")
 
 
 class Analytics(object):
@@ -26,6 +27,52 @@ class Analytics(object):
         if analytics.lower() == 'false':
             return
 
+        # Here verifies if users exists if not fills DashUsers
+        url_users = '{}/dash-users/count'.format(api_url)
+        headers_users = {'Content-type': 'application/json'}
+        json_users = {
+            "psid": message.get('sender').get('id')
+        }
+
+        request = requests.get(url_users, json=json_users, headers=headers_users)
+        if request.ok:
+            r_json = request.json()
+
+            if r_json['count'] == 0:
+
+                r = requests.get(
+                    'https://graph.facebook.com/v2.11/{sender}'.format(sender=message.get('sender').get('id')),
+                    params={
+                        'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
+                        'access_token': fb_access_token
+                    },
+                    timeout=None
+                )
+
+                if r.ok:
+                    fb_result = r.json()
+                    print(fb_result)
+
+                    send_user = {
+                        "firstName": fb_result['first_name'],
+                        "lastName": fb_result['last_name'],
+                        "profilePic": fb_result['profile_pic'],
+                        "locale": fb_result['locale'],
+                        "timezone": fb_result['timezone'],
+                        "gender": fb_result['gender'],
+                        "psid": message.get('sender').get('id')
+                    }
+
+                    rx = requests.post(url_users, json=send_user, headers=headers_users)
+
+                    if not rx.ok:
+                        print("[Error] Analytics on sending user to database: {0}".format(send_user))
+                else:
+                    print("[Error] Analytics on getting user info from facebook: {0}".format("12312"))
+        else:
+            print("[Error] Analytics on getting user count: {0}".format(json_users))
+
+        # Here sends the message to dash-messages
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 
@@ -90,7 +137,7 @@ class Analytics(object):
         # Save message to Dashbot
         data = {
             'url': 'https://graph.facebook.com/v2.6/me/messages',
-            'qs': {'access_token': os.getenv("FB_ACCESS_TOKEN")},
+            'qs': {'access_token': fb_access_token},
             'method': 'POST',
             'json': body
         }

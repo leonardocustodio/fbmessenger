@@ -15,6 +15,7 @@ api_url = os.environ["API_URL"]
 analytics = os.environ["ANALYTICS"]
 fb_access_token = os.environ["FB_ACCESS_TOKEN"]
 
+
 class Analytics(object):
 
     @staticmethod

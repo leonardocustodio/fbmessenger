@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.36'
+__version__ = '5.9.38'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -23,13 +23,13 @@ class Analytics(object):
             return
 
         # Here verifies if users exists if not fills DashUsers
-        url_users = '{}/dash-users/count'.format(api_url)
+        url_users = '{}/dash-users'.format(api_url)
         headers_users = {'Content-type': 'application/json'}
         json_users = {
             "psid": message.get('sender').get('id')
         }
 
-        request = requests.get(url_users, json=json_users, headers=headers_users)
+        request = requests.get('{}/count'.format(url_users), json=json_users, headers=headers_users)
         if request.ok:
             r_json = request.json()
 
@@ -38,7 +38,7 @@ class Analytics(object):
                 r = requests.get(
                     'https://graph.facebook.com/v2.11/{sender}'.format(sender=message.get('sender').get('id')),
                     params={
-                        'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
+                        'fields': 'name,first_name,last_name,profile_pic,locale,timezone,gender',
                         'access_token': fb_access_token
                     },
                     timeout=None
@@ -49,6 +49,7 @@ class Analytics(object):
                     print(fb_result)
 
                     send_user = {
+                        "name": fb_result['name'],
                         "firstName": fb_result['first_name'],
                         "lastName": fb_result['last_name'],
                         "profilePic": fb_result['profile_pic'],
@@ -63,7 +64,7 @@ class Analytics(object):
                     if not rx.ok:
                         print("[Error] Analytics on sending user to database: {0}".format(send_user))
                 else:
-                    print("[Error] Analytics on getting user info from facebook: {0}".format("12312"))
+                    print("[Error] Analytics on getting user info from facebook: {0}".format(message.get('sender').get('id')))
         else:
             print("[Error] Analytics on getting user count: {0}".format(json_users))
 

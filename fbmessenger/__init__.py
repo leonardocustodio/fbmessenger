@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.40'
+__version__ = '5.9.41'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -27,14 +27,11 @@ class Analytics(object):
         if not is_echo:
             url_users = '{}/dash-users'.format(api_url)
             headers_users = {'Content-type': 'application/json'}
-            json_users = {
-                "psid": message.get('sender').get('id')
-            }
 
-            request = requests.get('{}/count'.format(url_users), json=json_users, headers=headers_users)
+            request = requests.get('{0}/count?where[psid]={1}'.format(url_users, message.get('sender').get('id')), headers=headers_users)
             if request.ok:
                 r_json = request.json()
-                print("PSID: {0} - Count: {1}".format(message.get('sender').get('id'), r_json['count']))
+                # print("PSID: {0} - Count: {1}".format(message.get('sender').get('id'), r_json['count']))
 
                 if r_json['count'] is 0:
 
@@ -49,7 +46,7 @@ class Analytics(object):
 
                     if r.ok:
                         fb_result = r.json()
-                        print(fb_result)
+                        # print(fb_result)
 
                         send_user = {
                             "name": fb_result['name'],

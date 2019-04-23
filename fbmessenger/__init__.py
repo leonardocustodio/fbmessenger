@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.41'
+__version__ = '5.9.45'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -20,8 +20,6 @@ class Analytics(object):
 
     @staticmethod
     def save(message, entry, payload, message_type, is_echo=False, thread_control="bot"):
-        if analytics.lower() == 'false':
-            return
 
         # Here verifies if users exists if not fills DashUsers
         if not is_echo:
@@ -66,9 +64,13 @@ class Analytics(object):
                     else:
                         print("[Error] Analytics on getting user info from facebook: {0}".format(message.get('sender').get('id')))
             else:
-                print("[Error] Analytics on getting user count: {0}".format(json_users))
+                print("[Error] Analytics on getting user count: {0}".format(message.get('sender').get('id')))
 
+        #
         # Here sends the message to dash-messages
+        if analytics.lower() == 'false':
+            return
+
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}
 

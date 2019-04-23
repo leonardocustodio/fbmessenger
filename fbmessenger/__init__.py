@@ -68,8 +68,8 @@ class Analytics(object):
 
         #
         # Here sends the message to dash-messages
-        # if analytics.lower() == 'false':
-            # return
+        if analytics.lower() == 'false':
+            return
 
         url = '{}/dash-messages'.format(api_url)
         headers = {'Content-type': 'application/json'}

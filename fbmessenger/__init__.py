@@ -7,7 +7,7 @@ import uuid
 import requests
 from dashbot import generic
 
-__version__ = '5.9.47'
+__version__ = '5.9.48'
 
 logger = logging.getLogger(__name__)
 dba = generic.generic(os.environ["DASHBOT_KEY"])
@@ -200,9 +200,9 @@ class MessengerClient(object):
             body['notification_type'] = notification_type
 
 
-        print('##### Sending OUTGOING')
+        # print('##### Sending OUTGOING')
         Analytics.send_outgoing(body)
-        print('##### BEFORE POST TO FACEBOOK')
+        # print('##### BEFORE POST TO FACEBOOK')
 
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
@@ -213,7 +213,8 @@ class MessengerClient(object):
             timeout=timeout
         )
 
-        print(r.json())
+        # print(body)
+        # print(r.json())
         return r.json()
 
     def send_action(self, sender_action, entry, timeout=None):
